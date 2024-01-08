@@ -12,13 +12,18 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject Point;
     float cameraHeight;
     float cameraWidth;
-    void Start()
-    {
-       GetCameraInfo();
-        
 
-        
-       
+    int currentPoint = 1;
+    int pointsCount;
+    List<GameObject> pointsInUse = new List<GameObject>();
+
+    private void Awake()
+    {
+        GetCameraInfo();
+    }
+    private void OnEnable()
+    {
+        Actions.OnPointClicked += PointClicked;
     }
 
     // Update is called once per frame
@@ -30,13 +35,15 @@ public class LevelManager : MonoBehaviour
 
     public void LoadLevel(LevelData levelData)
     {
-        
+        pointsCount = levelData.level_data.Count / 2;
         for (int i = 0; i < levelData.level_data.Count ; i+=2)
         {
             KeyValuePair<float, float> convertedPointPosition = Utils.ConvertAndNormalizePoints(levelData.level_data[i], levelData.level_data[i + 1], cameraWidth,cameraHeight);
             Vector3 pointPosition = new Vector3(convertedPointPosition.Key, convertedPointPosition.Value, 0);
-       
-            Instantiate(Point, pointPosition, Quaternion.identity);
+            GameObject point = Instantiate(Point, pointPosition, Quaternion.identity);
+            point.gameObject.GetComponent<Point>().SetInfo((i + 2) / 2);
+            pointsInUse.Add(point);
+            
         } 
 
     }
@@ -48,12 +55,33 @@ public class LevelManager : MonoBehaviour
         {
             cameraHeight = mainCamera.orthographicSize * 2f;
             cameraWidth = cameraHeight * mainCamera.aspect;
-            Instantiate(Point, new Vector3(cameraWidth / 2, cameraHeight / 2, 0), Quaternion.identity);
         }
         else
         {
             Debug.LogError("Main camera not found.");
         }
+    }
+
+    void PointClicked(int point)
+    {
+        if(pointsCount == point)
+        {
+            Debug.Log("Level finsihed");
+        }
+
+        if (point == currentPoint)
+        {
+            CorrectPointClicked();
+            
+        }
+    }
+
+    void CorrectPointClicked()
+    {
+        pointsInUse[currentPoint - 1].gameObject.GetComponent<Point>().ChangeStateToClicked();
+        currentPoint += 1;
+        
+
     }
 
   

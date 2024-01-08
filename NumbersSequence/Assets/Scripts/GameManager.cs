@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         levelList = SaveLoad.ReadJsonData();
-        levelManager.LoadLevel(levelList.levels[0]);
+        levelManager.LoadLevel(levelList.levels[1]);
 
     }
 
