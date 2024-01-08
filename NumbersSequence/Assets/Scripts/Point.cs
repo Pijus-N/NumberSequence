@@ -2,16 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class Point : MonoBehaviour
 {
-    private LevelList levelList;
-    [SerializeReference]private LevelManager levelManager;
     // Start is called before the first frame update
     void Start()
     {
-        levelList = SaveLoad.ReadJsonData();
-        levelManager.LoadLevel(levelList.levels[0]);
-
+        
     }
 
     // Update is called once per frame
