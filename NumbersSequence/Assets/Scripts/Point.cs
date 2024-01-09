@@ -28,6 +28,7 @@ public class Point : MonoBehaviour
         pointNumber = number;
         pointNumberText.text = number.ToString();
         GetComponent<SpriteRenderer>().sprite = defaultPointSprite;
+        animator.SetTrigger("Restart");
 
     }
 

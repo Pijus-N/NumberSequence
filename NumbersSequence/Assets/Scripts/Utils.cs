@@ -45,6 +45,19 @@ public class Utils
         return new KeyValuePair<float, float>(x, y);
     }
 
+    public static int FindMaximumNumberOfPoints(LevelList levelList)
+    {
+        int max = 0;
+        foreach(LevelData levelData in levelList.levels)
+        {
+            if (levelData.level_data.Count > max)
+            {
+                max = levelData.level_data.Count;
+            }
+        }
+        return max;
+    }
+
 
 
 }

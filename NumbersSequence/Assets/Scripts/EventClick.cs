@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class EventClick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class EventClick : MonoBehaviour, IPointerDownHandler
 {
 
     public void OnPointerDown(PointerEventData eventData)
@@ -12,8 +12,4 @@ public class EventClick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         Actions.OnPointClicked(clickedPoint.GetComponent<Point>().GetNumber());
     }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        //Debug.Log(eventData.position);
-    }
 }
