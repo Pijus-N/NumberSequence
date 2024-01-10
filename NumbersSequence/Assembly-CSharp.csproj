@@ -64,7 +64,6 @@
     <Compile Include="Assets\Scripts\CanvasOverlapDetector.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Point.cs" />
-    <Compile Include="Assets\Scripts\ClickHandler.cs" />
     <Compile Include="Assets\Scripts\SaveLoad.cs" />
     <Compile Include="Assets\Scripts\LevelSelectMenu.cs" />
     <Compile Include="Assets\Scripts\Utils.cs" />
