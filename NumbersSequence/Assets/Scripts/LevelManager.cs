@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Net;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
@@ -13,14 +15,19 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private RopeRenderer ropeRenderer;
     [SerializeField] private Transform poolPosition;
     [SerializeField] private Transform pointsParent;
+    [SerializeField] private MatchOrthograhpicSize matchOrthograhpicSize;
+    [SerializeField] private AnimationCurve ScaleFactorCurve;//Curve of scale factor according to the points amount in the level
+
+    [SerializeField] private float imageWidth;
+    [SerializeField] private float imageHeight;
+
     private List<GameObject> pointsPool = new List<GameObject>();
-    private int pointInUseIndex;
+    private int pointInUseIndex;//currently picked up point for set up
     float cameraHeight;
     float cameraWidth;
 
-    int currentPoint;
-    int pointsCount;
-
+    int currentPointToClick;//Current point to click
+    int pointsCount;//points amount in a level
 
     private void Awake()
     {
@@ -38,33 +45,39 @@ public class LevelManager : MonoBehaviour
         Actions.OnLevelsLoaded -= PoolPoints;
         Actions.OnLevelFinish -= UnLoadLevel;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-
+    /// <summary>
+    /// Load a level
+    /// </summary>
+    /// <param name="levelData">level data of point for loading</param>
     public void LoadLevel(LevelData levelData)
     {
-        currentPoint = 1;
-        pointInUseIndex = 0;
-        pointsCount = levelData.level_data.Count / 2;
+
+        currentPointToClick = 1;//Start clicking from the first point 
+
+        pointInUseIndex = 0;//couldnt use i since i+=2
+        pointsCount = levelData.level_data.Count / 2;//get points amount in a level from level_data
         for (int i = 0; i < levelData.level_data.Count; i += 2)
         {
-            KeyValuePair<float, float> convertedPointPosition = Utils.ConvertAndNormalizePoints(levelData.level_data[i], levelData.level_data[i + 1], cameraWidth, cameraHeight);
+            float scale_factor = ScaleFactorCurve.Evaluate(pointsCount); //Get scale factor depending on the number of points
+            KeyValuePair<float, float> convertedPointPosition = Utils.ConvertPointToUnityCoordSpace(levelData.level_data[i], levelData.level_data[i + 1], scale_factor, imageWidth, imageHeight);
+            matchOrthograhpicSize.SetOrthographicSize(imageWidth*scale_factor, imageHeight * scale_factor);
             Vector3 pointPosition = new Vector3(convertedPointPosition.Key, convertedPointPosition.Value, 0);
             GameObject point = pointsPool[pointInUseIndex];
             point.transform.position = pointPosition;
             point.gameObject.GetComponent<Point>().SetInfo((i + 2) / 2);
             pointInUseIndex++;
-
-
+            point.SetActive(true);
+        }
+        //When all points are set up check if any of them are overlapping with number canvas
+        for(int i =0; i<pointsCount; i++)
+        {
+            pointsPool[i].gameObject.GetComponent<Point>().CheckIfCanvasIsOverlaping();
         }
 
     }
-
+    /// <summary>
+    /// Set up camera values
+    /// </summary>
     void GetCameraInfo()
     {
         Camera mainCamera = Camera.main;
@@ -78,30 +91,35 @@ public class LevelManager : MonoBehaviour
             Debug.LogError("Main camera not found.");
         }
     }
-
+    /// <summary>
+    /// Point clicked
+    /// </summary>
+    /// <param name="point">number of a clicked point</param>
     void PointClicked(int point)
     {
-        if (point == currentPoint)
+        if (point == currentPointToClick)
         {
             CorrectPointClicked();
             if (pointsCount == point)
             {
                 ropeRenderer.SetTheLastPoint();
-                DrawLineBetweenPoints(currentPoint - 2, 0);
+                DrawLineBetweenPoints(currentPointToClick - 2, 0);
             }
 
         }
         
     }
-
+    /// <summary>
+    /// Logic if correct point is clicked
+    /// </summary>
     void CorrectPointClicked()
     {
-        if (currentPoint != 1)
+        if (currentPointToClick != 1)
         {
-            DrawLineBetweenPoints(currentPoint - 2, currentPoint - 1);
+            DrawLineBetweenPoints(currentPointToClick - 2, currentPointToClick - 1);
         }
-        pointsPool[currentPoint - 1].gameObject.GetComponent<Point>().ChangeStateToClicked();
-        currentPoint += 1;
+        pointsPool[currentPointToClick - 1].gameObject.GetComponent<Point>().ChangeStateToClicked();
+        currentPointToClick += 1;
 
     }
 
@@ -127,12 +145,17 @@ public class LevelManager : MonoBehaviour
 
     void UnLoadLevel()
     {
-        foreach(GameObject point in pointsPool)
+        for(int i =0; i< pointsCount; i++)
         {
+            GameObject point = pointsPool[i];
             point.transform.position = poolPosition.position;
+            point.gameObject.GetComponent<Point>().ResetAnimation();
+            point.SetActive(false);
         }
-        currentPoint = 1;
+        currentPointToClick = 1;
     }
+
+
 
 
 

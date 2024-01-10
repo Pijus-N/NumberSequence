@@ -15,16 +15,15 @@ public class LevelSelectMenu : MonoBehaviour
     private void OnEnable()
     {
         Actions.OnLevelsLoaded += CreateButtons;
-        Actions.OnLevelFinish += ShowLevelMenu;
-
     }
     private void OnDisable()
     {
         Actions.OnLevelsLoaded -= CreateButtons;
-        Actions.OnLevelFinish -= ShowLevelMenu;
-
     }
-
+    /// <summary>
+    /// Create buttons dinamically according to the given amount of levels
+    /// </summary>
+    /// <param name="levelList">all levels list</param>
     public void CreateButtons(LevelList levelList)
     {
         
@@ -33,7 +32,7 @@ public class LevelSelectMenu : MonoBehaviour
             GameObject buttonObj = Instantiate(buttonPrefab, contentParent);
             Button button = buttonObj.GetComponent<Button>();
             int index = i;
-            button.onClick.AddListener(() => StartLevel(index));
+            button.onClick.AddListener(() => StartLevel(index));//Add on click behaviour
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append("Level ");
             stringBuilder.Append((i + 1).ToString());
@@ -51,13 +50,11 @@ public class LevelSelectMenu : MonoBehaviour
 
     void HideLevelMenu()
     {
-        LevelsScrollView.SetActive(false);
+        gameObject.SetActive(false);
     }
 
-    void ShowLevelMenu()
-    {
-        LevelsScrollView.gameObject.SetActive(true);
-    }
+
+
 
 
 

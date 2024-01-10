@@ -12,18 +12,13 @@ public class GameManager : MonoBehaviour
         levelList = SaveLoad.ReadJsonData();
         Actions.OnLevelsLoaded(levelList);
 
-
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    /// <summary>
+    /// Load level according to the index
+    /// </summary>
+    /// <param name="levelIndex">index of a level to load</param>
     public void LoadLevel(int levelIndex)
     {
         levelManager.LoadLevel(levelList.levels[levelIndex]);
-
     }
 }
